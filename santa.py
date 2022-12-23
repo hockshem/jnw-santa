@@ -14,6 +14,7 @@ import logging
 from discord.ext import tasks, commands 
 from discord.ui import View, Button
 
+import csv
 import random
 
 # TODO: Some emoji is reported as unknown, consider using a fixed emoji for each category
@@ -38,14 +39,26 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w'
 
 client = discord.Client(intents=intents)
 
+columns = []
+member_points = {}
+
+with open('test_data.csv', newline='') as test_file:
+    reader = csv.DictReader(test_file)
+    columns = reader.fieldnames
+    print(columns)
+    member_points = {row.pop('Discord ID') : row for row in reader}
+
 @client.event
 async def on_ready():
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------')
-    
-    await send_event_embed()
+
+    print(get_balance("929041997153579019"))
+    register("1234")
+    flush_member_points()
+    # await send_event_embed()
 
 
 @client.event
@@ -67,29 +80,44 @@ async def on_message(message):
     # send the model's response to the Discord channel
     
     await message.reply(response)
+    
 
-def check_balance():
+def flush_member_points():
+    with open('test_data.csv', 'w', newline='') as test_file:
+        writer = csv.DictWriter(test_file, fieldnames=columns)
+        writer.writeheader()
+        ids = list(member_points.keys())
+        rows_partial = [list(row.values()) for row in member_points.values()]
+        print(ids)
+        print(rows_partial)
+        rows_full = [[id] + row for id, row in zip(ids, rows_partial)]
+        print(rows_full)
+        writer.writerows([dict(zip(columns, row)) for row in rows_full])
+
+def register(user_id):
+    member_points.update({user_id: dict(zip(columns[1:], ['0', '0', '', '']))})
     pass
 
-def increase_balance():
-    pass
+def get_balance(user_id):
+    return member_points[user_id]['Balance']
 
-def decrease_balance():
-    pass
+def increase_balance(user_id, amount):
+    member_points[user_id]['Balance'] += amount
+    
+def decrease_balance(user_id, amount):
+    member_points[user_id]['Balance'] -= amount
 
-def claim_daily_reward():
-    pass
+# def claim_daily_reward():
+#     pass
 
-def wish(member, tier):
-    pass
+# def wish(member, tier):
+#     pass
 
-def claim_gift():
-    pass
+# def claim_gift():
+#     pass
 
-def view_prize_pool():
-    pass
-
-
+# def view_prize_pool():
+#     pass
 
 def get_emoji(type, n=[1, 1]):
     num = random.randint(n[0], n[1])
@@ -100,7 +128,7 @@ async def send_event_embed():
     # get the test channel 
     test_channel = client.get_channel(1055319238149144576)
     # TODO: add checking and not resend the event embed if it already exists
-    event_embed = create_event_embed()
+    event_embed = create_embed_base()
 
     image_url = "jerwhiko.png"
     file = discord.File(image_url, filename="jerwhiko.png")
@@ -112,12 +140,17 @@ async def send_event_embed():
     button.custom_id = 'test'
     button.callback = reply_on_interact
 
+    file_button = Button()
+    file_button.label = 'file'
+    file_button.custom_id = 'file'
+
     disabled_button = Button()
     disabled_button.label = 'disabled'
     disabled_button.custom_id = 'disabled'
     disabled_button.disabled = True
 
     component_view.add_item(button)
+    component_view.add_item(file_button)
     component_view.add_item(disabled_button)
 
     event_embed.set_image(url="attachment://jerwhiko.png")
@@ -130,7 +163,7 @@ async def reply_on_interact(interaction):
     await interaction.response.send_message((f"{author}, you're so cool!"))
 
 
-def create_event_embed():
+def create_embed_base():
     title = "Test Embed"
     desc = "Test Description"
     
