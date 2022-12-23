@@ -11,11 +11,11 @@ import re
 # the Discord Python API
 import discord
 import logging
-from discord.ext import tasks, commands 
 from discord.ui import View, Button
+from discord.ext import tasks, commands 
 
-import csv
 import random
+import pandas as pd
 
 # TODO: Some emoji is reported as unknown, consider using a fixed emoji for each category
 reaction_emojis = {
@@ -39,15 +39,6 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w'
 
 client = discord.Client(intents=intents)
 
-columns = []
-member_points = {}
-
-with open('test_data.csv', newline='') as test_file:
-    reader = csv.DictReader(test_file)
-    columns = reader.fieldnames
-    print(columns)
-    member_points = {row.pop('Discord ID') : row for row in reader}
-
 @client.event
 async def on_ready():
     print('Logged in as')
@@ -55,9 +46,6 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
-    print(get_balance("929041997153579019"))
-    register("1234")
-    flush_member_points()
     # await send_event_embed()
 
 
@@ -80,32 +68,7 @@ async def on_message(message):
     # send the model's response to the Discord channel
     
     await message.reply(response)
-    
 
-def flush_member_points():
-    with open('test_data.csv', 'w', newline='') as test_file:
-        writer = csv.DictWriter(test_file, fieldnames=columns)
-        writer.writeheader()
-        ids = list(member_points.keys())
-        rows_partial = [list(row.values()) for row in member_points.values()]
-        print(ids)
-        print(rows_partial)
-        rows_full = [[id] + row for id, row in zip(ids, rows_partial)]
-        print(rows_full)
-        writer.writerows([dict(zip(columns, row)) for row in rows_full])
-
-def register(user_id):
-    member_points.update({user_id: dict(zip(columns[1:], ['0', '0', '', '']))})
-    pass
-
-def get_balance(user_id):
-    return member_points[user_id]['Balance']
-
-def increase_balance(user_id, amount):
-    member_points[user_id]['Balance'] += amount
-    
-def decrease_balance(user_id, amount):
-    member_points[user_id]['Balance'] -= amount
 
 # def claim_daily_reward():
 #     pass
@@ -113,8 +76,9 @@ def decrease_balance(user_id, amount):
 # def wish(member, tier):
 #     pass
 
-# def claim_gift():
-#     pass
+def claim_gift(user_id):
+    # if not member has role 1049961153712889856, reject 
+    pass
 
 # def view_prize_pool():
 #     pass
@@ -128,7 +92,10 @@ async def send_event_embed():
     # get the test channel 
     test_channel = client.get_channel(1055319238149144576)
     # TODO: add checking and not resend the event embed if it already exists
-    event_embed = create_embed_base()
+    title = "Test Embed"
+    desc = "Test Description"
+    
+    event_embed = discord.Embed(title=title, description=desc)
 
     image_url = "jerwhiko.png"
     file = discord.File(image_url, filename="jerwhiko.png")
@@ -162,13 +129,5 @@ async def reply_on_interact(interaction):
     author = interaction.user.name
     await interaction.response.send_message((f"{author}, you're so cool!"))
 
-
-def create_embed_base():
-    title = "Test Embed"
-    desc = "Test Description"
-    
-    embed = discord.Embed(title=title, description=desc)
-    
-    return embed
 
 client.run(token, log_handler=handler)
