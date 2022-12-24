@@ -13,6 +13,8 @@ def register_new_usr(user_id):
     
 
 def get_pts_bal(user_id):
+    if user_id not in points_df.index: 
+        register_new_usr(user_id)
     return points_df.loc[user_id, "Balance"]
 
 def get_pts_acc(user_id):

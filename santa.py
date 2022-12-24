@@ -10,7 +10,6 @@ import logging
 from discord.ui import View, Button
 from discord.ext import tasks, commands 
 
-import random
 from wish import standard_wish, premium_wish
 from member_points import increase_pts, get_pts_bal
 
@@ -42,9 +41,13 @@ async def test(ctx, arg):
     await ctx.send(arg)
 
 @client.command()
-async def give(ctx, member: discord.Member, pts: int):
-    increase_pts(member.id, pts)
-    await ctx.send(f"{member.name} has successfully received {str(pts)} points!")
+async def give(ctx, pts: int, *members: discord.Member):
+    ids = []
+    for member in members: 
+        increase_pts(member.id, pts)
+        ids.append(f"<@{member.id}>")
+    recipients = ', '.join(ids)
+    await ctx.send(f"{recipients} received {str(pts)} points!")
 
 @client.command()
 async def balance(ctx, member: discord.Member):
@@ -54,11 +57,6 @@ async def balance(ctx, member: discord.Member):
 def claim_gift(user_id):
     # if not member has role 1049961153712889856, reject 
     pass
-
-def get_emoji(type, n=[1, 1]):
-    num = random.randint(n[0], n[1])
-    # return [random.choice(reaction_emojis[type]) for _ in range(num)]
-    return ['👌']
 
 async def send_event_embed():
     # get the test channel 
