@@ -85,6 +85,7 @@ def add_to_prize_pool(tier, item_name, total, contributor_id=""):
 
     items_num = get_item_count_in_tier(tier)
     next_item = items_num + 1
+    total = int(total)
     prefix = ''
 
     tier = int(tier)
@@ -132,7 +133,7 @@ def _wish(tier):
     return wish_result_id
 
 def update_prize_pool(item_id, amount):
-    prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Remaining"] += amount
+    prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Remaining"] += int(amount)
     _flush_prize_pool_data()
 
 def _update_wish_record(user_id, item_id, item_name):
