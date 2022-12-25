@@ -40,7 +40,7 @@ def premium_wish(user_id, user_roles):
         cost = wish_req_df.loc[1, "Cost"]
         decrease_pts(user_id, cost)
         _update_wish_record(user_id, wish_result, prize_name)
-        _update_prize_pool(wish_result, -1)
+        update_prize_pool(wish_result, -1)
         
         return {
             "Prize ID": wish_result,
@@ -60,7 +60,7 @@ def standard_wish(user_id, user_roles):
         _update_wish_record(user_id, wish_result, prize_name)
 
         if not str(prize_name).lower() == "nothing":
-            _update_prize_pool(wish_result, -1)
+            update_prize_pool(wish_result, -1)
 
         return {
             "Prize ID": wish_result,
@@ -76,7 +76,7 @@ def view_prize_pool():
         prize_pool_dict[i] = []
     
     for i, id, name, left in zip(prize_pool_df.index, prize_pool_df["Item ID"], prize_pool_df["Item Name"], prize_pool_df["Remaining"]):
-        prize_pool_dict[i] += [id, name, left]
+        prize_pool_dict[i].append([id, name, left])
 
     return prize_pool_dict
 
@@ -87,12 +87,14 @@ def add_to_prize_pool(tier, item_name, total, contributor_id=""):
     next_item = items_num + 1
     prefix = ''
 
+    tier = int(tier)
+    print(tier)
     if tier == 0:
         prefix = 'A'
     elif tier == 1:
         prefix = 'B'
     elif tier == 2:
-        prefix == 'C'
+        prefix = 'C'
 
     next_id = f"{prefix}{str(next_item).zfill(4)}"
     
@@ -129,7 +131,7 @@ def _wish(tier):
     
     return wish_result_id
 
-def _update_prize_pool(item_id, amount):
+def update_prize_pool(item_id, amount):
     prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Remaining"] += amount
     _flush_prize_pool_data()
 
@@ -149,4 +151,3 @@ def _flush_prize_pool_data():
 
 def _flush_wish_records():
     wish_records_df.to_csv("./csv_data/wish_records.csv", index=False)
-

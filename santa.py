@@ -10,7 +10,7 @@ import logging
 from discord.ui import View, Button
 from discord.ext import tasks, commands 
 
-from wish import standard_wish, premium_wish, _update_prize_pool
+from wish import standard_wish, premium_wish, view_prize_pool, add_to_prize_pool, update_prize_pool, get_prize_name
 from member_points import increase_pts, get_pts_bal, claim_daily
 
 load_dotenv()
@@ -54,17 +54,43 @@ async def balance(ctx, member: discord.Member):
     bal = get_pts_bal(member.id)
     await ctx.send(f"{member.name} has {str(bal)} points!")
 
-# @client.command()
-# async def prizepool(ctx):
-#     pass
+@client.command()
+async def prizepool(ctx):
+    prize_pool_dict = view_prize_pool()
 
-# @client.command()
-# async def add(ctx, item_name, total_amount, contributor_id=""): 
-#     pass
+    prize_pool_embed = discord.Embed(title="Prize Pool")
+    
+    prize_id_str = ""
+    prize_name_str = ""
+    remaining_str = ""
+    total_prizes = 0
 
-# @client.command()
-# async def update(ctx, item_id, change):
-#     pass
+    for _, prizes in prize_pool_dict.items():
+        for prize in prizes: 
+            prize_id, prize_name, remaining = prize
+            total_prizes += int(remaining)
+            prize_id_str += f"{prize_id}\n"
+            prize_name_str += f"{prize_name}\n"
+            remaining_str += f"{remaining}\n"
+
+    prize_pool_embed.add_field(name="Prize ID", value=prize_id_str, inline=True)
+    prize_pool_embed.add_field(name="Prize Name", value=prize_name_str, inline=True)
+    prize_pool_embed.add_field(name="Remaining", value=remaining_str, inline=True)
+
+    prize_pool_embed.set_footer(text=f"Total: {total_prizes}")
+
+    await ctx.send(embed=prize_pool_embed, ephemeral=True)
+
+
+@client.command()
+async def additem(ctx, tier, item_name, total_amount, contributor_id=""): 
+    add_to_prize_pool(int(tier), item_name, total_amount, contributor_id)
+    await ctx.send(f"Successfully added {item_name} x{total_amount} into the Tier {tier} prize pool.", ephemeral=True)
+
+@client.command()
+async def update(ctx, item_id, change):
+    update_prize_pool(item_id, change)
+    await ctx.send(f"Successfully updated the amount of item {item_id}: {get_prize_name(item_id)}!")
     
 
 async def send_event_embed():
@@ -115,11 +141,14 @@ async def send_wish_details(interaction):
 
     std_wish_button = Button()
     std_wish_button.label = 'Standard Wish'
+    std_wish_button.emoji = '🎩'
     std_wish_button.custom_id = 'stdwish'
     std_wish_button.callback = std_wish
 
     prm_wish_button = Button()
     prm_wish_button.label = 'Premium Wish'
+    prm_wish_button.style = discord.ButtonStyle.primary
+    prm_wish_button.emoji = '👑'
     prm_wish_button.custom_id = 'prmwish'
     prm_wish_button.callback = prm_wish
 
@@ -140,9 +169,9 @@ async def std_wish(interaction):
     else: 
         prize = result["Prize Name"]
         if prize.lower() == "nothing":
-            result_message = f"Sorry, {member.name}, you won nothing! Better luck next time!"
+            result_message = f"Sorry, <@{member.id}>, you won nothing! Better luck next time!"
         else: 
-            result_message = f"Congratulations! {member.name}, you have won {prize} x1!"
+            result_message = f"Congratulations! <@{member.id}>, you have won {prize} x1!"
     
     await interaction.response.send_message(result_message, ephemeral=True)
 
@@ -156,7 +185,7 @@ async def prm_wish(interaction):
         result_message = f"{member.name}, you don't have enough balance or the required role to use that wish."
     else: 
         prize = result["Prize Name"]
-        result_message = f"Congratulations! {member.name}, you have won {prize} x1!"
+        result_message = f"Congratulations! <@{member.id}>, you have won {prize} x1!"
 
     await interaction.response.send_message(result_message, ephemeral=True)
 

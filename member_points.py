@@ -57,7 +57,7 @@ def _can_claim_daily(user_id):
 
 def claim_daily(user_id):
     global daily_df
-    daily_pts = 50 
+    daily_pts = 10
     
     result = {
         'status': False,
