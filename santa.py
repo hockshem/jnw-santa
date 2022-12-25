@@ -10,8 +10,8 @@ import logging
 from discord.ui import View, Button
 from discord.ext import tasks, commands 
 
-from wish import standard_wish, premium_wish
-from member_points import increase_pts, get_pts_bal
+from wish import standard_wish, premium_wish, _update_prize_pool
+from member_points import increase_pts, get_pts_bal, claim_daily
 
 load_dotenv()
 token = os.getenv('BOT_TOKEN')
@@ -54,9 +54,18 @@ async def balance(ctx, member: discord.Member):
     bal = get_pts_bal(member.id)
     await ctx.send(f"{member.name} has {str(bal)} points!")
 
-def claim_gift(user_id):
-    # if not member has role 1049961153712889856, reject 
-    pass
+# @client.command()
+# async def prizepool(ctx):
+#     pass
+
+# @client.command()
+# async def add(ctx, item_name, total_amount, contributor_id=""): 
+#     pass
+
+# @client.command()
+# async def update(ctx, item_id, change):
+#     pass
+    
 
 async def send_event_embed():
     # get the test channel 
@@ -82,14 +91,14 @@ async def send_event_embed():
     bal_button.custom_id = 'balance'
     bal_button.callback = send_balance
 
-    # disabled_button = Button()
-    # disabled_button.label = 'disabled'
-    # disabled_button.custom_id = 'disabled'
-    # disabled_button.disabled = True
+    daily_button = Button()
+    daily_button.label = 'Daily'
+    daily_button.custom_id = 'daily'
+    daily_button.callback = claim
 
     component_view.add_item(wish_button)
     component_view.add_item(bal_button)
-    # component_view.add_item(disabled_button)
+    component_view.add_item(daily_button)
 
     event_embed.set_image(url="attachment://gacha.jpeg")
 
@@ -149,6 +158,21 @@ async def prm_wish(interaction):
         prize = result["Prize Name"]
         result_message = f"Congratulations! {member.name}, you have won {prize} x1!"
 
+    await interaction.response.send_message(result_message, ephemeral=True)
+
+async def claim(interaction):
+    member = interaction.user
+    claim_result = claim_daily(member.id)
+    status = claim_result["status"]
+    points = claim_result["points"]
+
+    result_message = ""
+
+    if status:
+        result_message = f"<@{member.id}>, you claimed ${points} successfully!"
+    else:
+        result_message = f"<@{member.id}>, you just claimed today! Come back tomorrow!"
+    
     await interaction.response.send_message(result_message, ephemeral=True)
 
 client.run(token, log_handler=handler)

@@ -4,19 +4,17 @@ import time
 
 from member_points import get_pts_bal, decrease_pts
 
+# TODO: add handling when the prize pool has nothing else
+
 prize_pool_df = pd.read_csv("./csv_data/prize_pool.csv", index_col="Tier")
 prize_pool_df = prize_pool_df.fillna("")
-# print(prize_df)
-
 
 wish_req_df = pd.read_csv("./csv_data/wish_info.csv", index_col="Tier")
 wish_req_df = wish_req_df.fillna(0)
 wish_req_df["Required Role"] = wish_req_df["Required Role"].astype(np.int64)
-# print(wish_req_df)
 
 wish_records_df = pd.read_csv("./csv_data/wish_records.csv")
 wish_records_df = wish_records_df.fillna("")
-# print(wish_records_df)
 
 def is_wishable(user_id, user_roles, tier):
     cost = wish_req_df.loc[tier, "Cost"]
@@ -41,8 +39,8 @@ def premium_wish(user_id, user_roles):
 
         cost = wish_req_df.loc[1, "Cost"]
         decrease_pts(user_id, cost)
-        update_wish_record(user_id, wish_result, prize_name)
-        update_prize_pool(wish_result, -1)
+        _update_wish_record(user_id, wish_result, prize_name)
+        _update_prize_pool(wish_result, -1)
         
         return {
             "Prize ID": wish_result,
@@ -59,10 +57,10 @@ def standard_wish(user_id, user_roles):
 
         cost = wish_req_df.loc[2, "Cost"]
         decrease_pts(user_id, cost)
-        update_wish_record(user_id, wish_result, prize_name)
+        _update_wish_record(user_id, wish_result, prize_name)
 
         if not str(prize_name).lower() == "nothing":
-            update_prize_pool(wish_result, -1)
+            _update_prize_pool(wish_result, -1)
 
         return {
             "Prize ID": wish_result,
@@ -70,6 +68,41 @@ def standard_wish(user_id, user_roles):
         }
 
     return None
+
+def view_prize_pool():
+    prize_pool_dict = {}
+    
+    for i in prize_pool_df.index.unique():
+        prize_pool_dict[i] = []
+    
+    for i, id, name, left in zip(prize_pool_df.index, prize_pool_df["Item ID"], prize_pool_df["Item Name"], prize_pool_df["Remaining"]):
+        prize_pool_dict[i] += [id, name, left]
+
+    return prize_pool_dict
+
+def add_to_prize_pool(tier, item_name, total, contributor_id=""):
+    global prize_pool_df
+
+    items_num = get_item_count_in_tier(tier)
+    next_item = items_num + 1
+    prefix = ''
+
+    if tier == 0:
+        prefix = 'A'
+    elif tier == 1:
+        prefix = 'B'
+    elif tier == 2:
+        prefix == 'C'
+
+    next_id = f"{prefix}{str(next_item).zfill(4)}"
+    
+    new_prize_df = pd.Series([next_id, item_name, total, total, "", contributor_id, ""], index=prize_pool_df.columns).to_frame().T    
+    new_prize_df.index = [tier]
+    prize_pool_df = pd.concat([prize_pool_df, new_prize_df])
+    _flush_prize_pool_data()
+    
+def get_item_count_in_tier(tier):
+    return prize_pool_df.loc[tier, "Item ID"].count()
 
 def _wish(tier):
     tiered_prize_pool = []
@@ -95,13 +128,12 @@ def _wish(tier):
     wish_result_id = rng.choice(tiered_prize_pool)
     
     return wish_result_id
-    
 
-def update_prize_pool(item_id, amount):
+def _update_prize_pool(item_id, amount):
     prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Remaining"] += amount
     _flush_prize_pool_data()
 
-def update_wish_record(user_id, item_id, item_name):
+def _update_wish_record(user_id, item_id, item_name):
     global wish_records_df
     timestamp = time.time()
     # TODO: add contributor
@@ -110,7 +142,7 @@ def update_wish_record(user_id, item_id, item_name):
     print(new_df)
     wish_records_df = pd.concat([wish_records_df, new_df], ignore_index=True)
     _flush_wish_records()
-
+    
 def _flush_prize_pool_data():
     new_prize_pool = prize_pool_df.reset_index(names="Tier")
     new_prize_pool.to_csv("./csv_data/prize_pool.csv", index=False)
@@ -118,7 +150,3 @@ def _flush_prize_pool_data():
 def _flush_wish_records():
     wish_records_df.to_csv("./csv_data/wish_records.csv", index=False)
 
-# TODO: add handling when the prize pool has nothing else
-# print(standard_wish(955688670428549120, [1027076134669660190, 1049961153712889856]))
-# print(premium_wish(955688670428549120, [1027076134669660190, 1049961153712889856]))
-# print(wish_records_df)
