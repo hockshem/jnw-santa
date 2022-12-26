@@ -144,7 +144,7 @@ async def send_wish_details(interaction):
     title = "选择许愿类型"
     
     wish_details_embed = discord.Embed(title=title)
-    wish_details_embed.add_field(name="普通许愿", value=f"""消耗: 100$JNW\n中奖概率：50% 落空、 40% 普通奖池奖品、10% 高级奖池奖品""", inline=False)
+    wish_details_embed.add_field(name="普通许愿", value=f"""消耗: 100$JNW\n中奖概率：25% 落空、 65% 普通奖池奖品、10% 高级奖池奖品""", inline=False)
     wish_details_embed.add_field(name="高级许愿", value=f"""消耗: 300$JNW\n中奖概率：40% 普通奖池奖品、60% 高级奖池奖品""", inline=False)
 
     std_wish_button = Button()

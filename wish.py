@@ -132,7 +132,7 @@ def _wish(tier):
         if rand_int > 90:
             tier = 1
             luck_status = 1
-        elif rand_int <= 50:
+        elif rand_int <= 25:
             tier = 3
             luck_status = -1
             
