@@ -65,7 +65,9 @@ async def prizepool(ctx):
     remaining_str = ""
     total_prizes = 0
 
-    for _, prizes in prize_pool_dict.items():
+    for tier, prizes in prize_pool_dict.items():
+        if tier == 3:
+            break
         for prize in prizes: 
             prize_id, prize_name, remaining = prize
             total_prizes += int(remaining)
