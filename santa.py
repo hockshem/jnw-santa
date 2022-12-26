@@ -99,7 +99,7 @@ async def send_event_embed():
     # get the test channel 
     test_channel = client.get_channel(1055319238149144576)
     # TODO: add checking and not resend the event embed if it already exists
-    title = "Jer\'s NFT World 圣诞跨年扭蛋"
+    title = "Jer\'s 圣诞跨年扭蛋"
     desc = """璀璨的星星灯点亮web3世界，
             岁末狂欢派对集结号已经吹响！
             参与各种活动取得 $JNW 来参加扭蛋吧！"""
