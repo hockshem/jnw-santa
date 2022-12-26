@@ -86,7 +86,7 @@ async def prizepool(ctx):
 
 @client.command()
 async def additem(ctx, tier, item_name, total_amount, contributor, twitter): 
-    add_to_prize_pool(int(tier), item_name, total_amount, contributor, twitter)
+    add_to_prize_pool(int(tier), item_name, int(total_amount), contributor, twitter)
     await ctx.send(f"Successfully added {item_name} x{total_amount} into the Tier {tier} prize pool.", ephemeral=True)
 
 @client.command()

@@ -96,11 +96,8 @@ def add_to_prize_pool(tier, item_name, total, contributor, twitter, image_name="
 
     items_num = get_item_count_in_tier(tier)
     next_item = items_num + 1
-    total = int
     prefix = ''
 
-    tier = int(tier)
-    print(tier)
     if tier == 1:
         prefix = 'A'
     elif tier == 2:
