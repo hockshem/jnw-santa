@@ -102,6 +102,7 @@ async def send_event_embed():
     title = "Jer\'s 圣诞跨年扭蛋"
     desc = """璀璨的星星灯点亮web3世界，
             岁末狂欢派对集结号已经吹响！
+
             参与各种活动取得 $JNW 来参加扭蛋吧！"""
     
     event_embed = discord.Embed(title=title, description=desc)
@@ -181,7 +182,7 @@ async def std_wish(interaction):
         await interaction.response.send_message(result_message, ephemeral=True)
         return
         
-    await send_wish_result_embed(result, interaction.response)
+    await send_wish_result_embed(result, interaction)
 
 async def prm_wish(interaction):
     member = interaction.user
@@ -194,9 +195,9 @@ async def prm_wish(interaction):
         await interaction.response.send_message(result_message, ephemeral=True)
         return
         
-    await send_wish_result_embed(result, interaction.response)
+    await send_wish_result_embed(result, interaction)
 
-async def send_wish_result_embed(result, response):
+async def send_wish_result_embed(result, interaction):
     directory = "./graphics/"
 
     luck_status = result["Status"]
@@ -204,27 +205,33 @@ async def send_wish_result_embed(result, response):
     twitter_link = result["Twitter"]
     image_name = result["Image"]
     contributor = result["Contributor"]
+    user_id = interaction.user.id 
 
     if luck_status == -1:
-        wish_result_embed = discord.Embed(title="抱歉！", description="很不幸地，你什么也没抽中！再接再厉！", colour=discord.Colour.red())
+        wish_result_embed = discord.Embed(title="抱歉！", description=f"很不幸地，<@{user_id}> 什么也没抽中！再接再厉！", colour=discord.Colour.red())
         wish_result_embed.set_image(url="https://media.giphy.com/media/d2lcHJTG5Tscg/giphy.gif")
-        await response.send_message(embed=wish_result_embed, ephemeral=True)
+        await interaction.response.send_message(embed=wish_result_embed, ephemeral=True)
+        wish_result_channel = await interaction.guild.fetch_channel(1056781667349569636)
+        await wish_result_channel.send(embed=wish_result_embed)
     else:
         colour = discord.Colour.green()
         if luck_status == 0:
             title="恭喜中奖！"
-            desc = f"恭喜！🎉 你抽中了： \n- {prize} x1"
+            desc = f"恭喜！🎉 <@{user_id}> 抽中了： \n- {prize} x1"
 
         elif luck_status == 1:
             title="欧运爆发！"
-            desc = f"你太好运啦！🎉🎉🎉 你在幸运之神的眷顾下抽中了： \n- {prize} x1！"
+            desc = f"<@{user_id}> 太好运啦！🎉🎉🎉 你在幸运之神的眷顾下抽中了： \n- {prize} x1！"
         
         wish_result_embed = discord.Embed(title=title, description=desc, colour=colour)
         wish_result_embed.add_field(name="Twitter链接", value=twitter_link, inline=False)
         wish_result_embed.add_field(name="奖品提供", value=contributor)
         thumbnail_file = discord.File(f"{directory}{image_name}", filename=image_name)
         wish_result_embed.set_thumbnail(url=f"attachment://{image_name}")
-        await response.send_message(file=thumbnail_file, embed=wish_result_embed, ephemeral=True)
+        await interaction.response.send_message(file=thumbnail_file, embed=wish_result_embed, ephemeral=True)
+        wish_result_channel = await interaction.guild.fetch_channel(1056781667349569636)
+        
+        await wish_result_channel.send(file=thumbnail_file, embed=wish_result_embed)
     
 
 async def claim(interaction):
