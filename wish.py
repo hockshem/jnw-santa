@@ -29,42 +29,53 @@ def is_wishable(user_id, user_roles, tier):
 def get_prize_name(item_id):
     return prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Item Name"].values[0]
 
-def claim_gift_exchange(user_id, user_roles):
-    pass
+def get_contributor(item_id):
+    return prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Contributor"].values[0]
+
+def get_twitter(item_id):
+    return prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Twitter Link"].values[0]
+
+def get_image_name(item_id):
+    return prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Image Name"].values[0]
 
 def premium_wish(user_id, user_roles):
     if is_wishable(user_id, user_roles, 1):
-        wish_result = _wish(1)
-        prize_name = get_prize_name(wish_result)
+        prize_id, status = _wish(1)
+        prize_name = get_prize_name(prize_id)
 
         cost = wish_req_df.loc[1, "Cost"]
         decrease_pts(user_id, cost)
-        _update_wish_record(user_id, wish_result, prize_name)
-        update_prize_pool(wish_result, -1)
+        _update_wish_record(user_id, prize_id, prize_name)
+        update_prize_pool(prize_id, -1)
         
         return {
-            "Prize ID": wish_result,
-            "Prize Name": prize_name
+            "Name": prize_name,
+            "Status": status,
+            "Twitter": get_twitter(prize_id),
+            "Image": get_image_name(prize_id),
+            "Contributor": get_contributor(prize_id)
         }
 
     return None
-    
 
 def standard_wish(user_id, user_roles):
     if is_wishable(user_id, user_roles, 2):
-        wish_result = _wish(2)
-        prize_name = get_prize_name(wish_result)
+        prize_id, status = _wish(2)
+        prize_name = get_prize_name(prize_id)
 
         cost = wish_req_df.loc[2, "Cost"]
         decrease_pts(user_id, cost)
-        _update_wish_record(user_id, wish_result, prize_name)
+        _update_wish_record(user_id, prize_id, prize_name)
 
-        if not str(prize_name).lower() == "nothing":
-            update_prize_pool(wish_result, -1)
+        if not status == -1:
+            update_prize_pool(prize_id, -1)
 
         return {
-            "Prize ID": wish_result,
-            "Prize Name": prize_name
+            "Name": prize_name,
+            "Status": status,
+            "Twitter": get_twitter(prize_id),
+            "Image": get_image_name(prize_id),
+            "Contributor": get_contributor(prize_id)
         }
 
     return None
@@ -80,26 +91,24 @@ def view_prize_pool():
 
     return prize_pool_dict
 
-def add_to_prize_pool(tier, item_name, total, contributor_id=""):
+def add_to_prize_pool(tier, item_name, total, contributor, twitter, image_name=""):
     global prize_pool_df
 
     items_num = get_item_count_in_tier(tier)
     next_item = items_num + 1
-    total = int(total)
+    total = int
     prefix = ''
 
     tier = int(tier)
     print(tier)
-    if tier == 0:
+    if tier == 1:
         prefix = 'A'
-    elif tier == 1:
-        prefix = 'B'
     elif tier == 2:
-        prefix = 'C'
+        prefix = 'B'
 
     next_id = f"{prefix}{str(next_item).zfill(4)}"
     
-    new_prize_df = pd.Series([next_id, item_name, total, total, "", contributor_id, ""], index=prize_pool_df.columns).to_frame().T    
+    new_prize_df = pd.Series([next_id, item_name, total, total, contributor, twitter, image_name], index=prize_pool_df.columns).to_frame().T
     new_prize_df.index = [tier]
     prize_pool_df = pd.concat([prize_pool_df, new_prize_df])
     _flush_prize_pool_data()
@@ -114,14 +123,19 @@ def _wish(tier):
     rand_int = rng.integers(1, 100, endpoint=True)
     
     if tier == 1:
-        if rand_int <= 25:
+        luck_status = 1
+        if rand_int <= 40:
             tier = 2
+            luck_status = 0
     elif tier == 2:
-        if rand_int > 95:
+        luck_status = 0
+        if rand_int > 90:
             tier = 1
-        elif rand_int <= 25:
+            luck_status = 1
+        elif rand_int <= 50:
             tier = 3
-
+            luck_status = -1
+            
     if len(prize_pool_df.loc[tier].shape) > 1:
         for item, remaining in zip(prize_pool_df.loc[tier, "Item ID"], prize_pool_df.loc[tier, "Remaining"]):
             tiered_prize_pool += [item] * remaining
@@ -130,7 +144,7 @@ def _wish(tier):
 
     wish_result_id = rng.choice(tiered_prize_pool)
     
-    return wish_result_id
+    return wish_result_id, luck_status
 
 def update_prize_pool(item_id, amount):
     prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Remaining"] += int(amount)
@@ -140,9 +154,7 @@ def _update_wish_record(user_id, item_id, item_name):
     global wish_records_df
     timestamp = time.time()
     # TODO: add contributor
-    print([timestamp, user_id, item_id, item_name, "", ""])
     new_df = pd.Series([timestamp, user_id, item_id, item_name, "", ""], index=wish_records_df.columns).to_frame().T
-    print(new_df)
     wish_records_df = pd.concat([wish_records_df, new_df], ignore_index=True)
     _flush_wish_records()
     

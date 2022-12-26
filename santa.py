@@ -83,8 +83,8 @@ async def prizepool(ctx):
 
 
 @client.command()
-async def additem(ctx, tier, item_name, total_amount, contributor_id=""): 
-    add_to_prize_pool(int(tier), item_name, total_amount, contributor_id)
+async def additem(ctx, tier, item_name, total_amount, contributor, twitter): 
+    add_to_prize_pool(int(tier), item_name, total_amount, contributor, twitter)
     await ctx.send(f"Successfully added {item_name} x{total_amount} into the Tier {tier} prize pool.", ephemeral=True)
 
 @client.command()
@@ -105,21 +105,26 @@ async def send_event_embed():
     image_url = "./graphics/gacha.jpeg"
     file = discord.File(image_url, filename="gacha.jpeg")
 
-    component_view = View()
+    component_view = View(timeout=None)
 
     wish_button = Button()
-    wish_button.label = 'Wish'
+    wish_button.label = '许愿'
     wish_button.custom_id = 'wish'
+    wish_button.emoji = '💫'
+    wish_button.style = discord.ButtonStyle.primary
     wish_button.callback = send_wish_details
 
     bal_button = Button()
-    bal_button.label = 'Balance'
+    bal_button.label = '查看余额'
     bal_button.custom_id = 'balance'
+    bal_button.emoji = '💰'
     bal_button.callback = send_balance
 
     daily_button = Button()
-    daily_button.label = 'Daily'
+    daily_button.label = '每日签到'
     daily_button.custom_id = 'daily'
+    daily_button.emoji = '📆'
+    daily_button.style = discord.ButtonStyle.success
     daily_button.callback = claim
 
     component_view.add_item(wish_button)
@@ -131,24 +136,27 @@ async def send_event_embed():
     await test_channel.send(file=file, embed=event_embed, view=component_view)
 
 async def send_balance(interaction):
+    user_id = interaction.user.id
     bal = get_pts_bal(interaction.user.id)
-    await interaction.response.send_message(f"You have {str(bal)} points!", ephemeral=True)
+    await interaction.response.send_message(f"<@{user_id}>，你的余额为 ``{str(bal)} $JNW``。", ephemeral=True)
 
 async def send_wish_details(interaction):
-    title = "Choose type of wish"
-    desc = "Normal Wish and Advanced Wish"
-    wish_details_embed = discord.Embed(title=title, description=desc)
+    title = "选择许愿类型"
+    
+    wish_details_embed = discord.Embed(title=title)
+    wish_details_embed.add_field(name="普通许愿", value=f"""消耗: 100$JNW\n中奖概率：50% 落空、 40% 普通奖池奖品、10% 高级奖池奖品""", inline=False)
+    wish_details_embed.add_field(name="高级许愿", value=f"""消耗: 300$JNW\n中奖概率：40% 普通奖池奖品、60% 高级奖池奖品""", inline=False)
 
     std_wish_button = Button()
-    std_wish_button.label = 'Standard Wish'
-    std_wish_button.emoji = '🎩'
+    std_wish_button.label = '普通许愿'
+    std_wish_button.emoji = '✨'
     std_wish_button.custom_id = 'stdwish'
     std_wish_button.callback = std_wish
 
     prm_wish_button = Button()
-    prm_wish_button.label = 'Premium Wish'
+    prm_wish_button.label = '高级许愿'
     prm_wish_button.style = discord.ButtonStyle.primary
-    prm_wish_button.emoji = '👑'
+    prm_wish_button.emoji = '🌟'
     prm_wish_button.custom_id = 'prmwish'
     prm_wish_button.callback = prm_wish
 
@@ -165,15 +173,11 @@ async def std_wish(interaction):
     result_message = ""
 
     if result is None: 
-        result_message = f"{member.name}, you don't have enough balance or the required role to use that wish."
-    else: 
-        prize = result["Prize Name"]
-        if prize.lower() == "nothing":
-            result_message = f"Sorry, <@{member.id}>, you won nothing! Better luck next time!"
-        else: 
-            result_message = f"Congratulations! <@{member.id}>, you have won {prize} x1!"
-    
-    await interaction.response.send_message(result_message, ephemeral=True)
+        result_message = f"{member.name}, 您的 `$JNW` 余额不足！"
+        await interaction.response.send_message(result_message, ephemeral=True)
+        return
+        
+    await send_wish_result_embed(result, interaction.response)
 
 async def prm_wish(interaction):
     member = interaction.user
@@ -182,12 +186,42 @@ async def prm_wish(interaction):
     result_message = ""
 
     if result is None: 
-        result_message = f"{member.name}, you don't have enough balance or the required role to use that wish."
-    else: 
-        prize = result["Prize Name"]
-        result_message = f"Congratulations! <@{member.id}>, you have won {prize} x1!"
+        result_message = f"{member.name}, 您的 `$JNW` 余额不足！"
+        await interaction.response.send_message(result_message, ephemeral=True)
+        return
+        
+    await send_wish_result_embed(result, interaction.response)
 
-    await interaction.response.send_message(result_message, ephemeral=True)
+async def send_wish_result_embed(result, response):
+    directory = "./graphics/"
+
+    luck_status = result["Status"]
+    prize = result["Name"]
+    twitter_link = result["Twitter"]
+    image_name = result["Image"]
+    contributor = result["Contributor"]
+
+    if luck_status == -1:
+        wish_result_embed = discord.Embed(title="抱歉！", description="很不幸地，你什么也没抽中！再接再厉！", colour=discord.Colour.red())
+        wish_result_embed.set_image(url="https://media.giphy.com/media/d2lcHJTG5Tscg/giphy.gif")
+        await response.send_message(embed=wish_result_embed, ephemeral=True)
+    else:
+        colour = discord.Colour.green()
+        if luck_status == 0:
+            title="恭喜中奖！"
+            desc = f"恭喜！🎉 你抽中了： \n- {prize} x1"
+
+        elif luck_status == 1:
+            title="欧运爆发！"
+            desc = f"你太好运啦！🎉🎉🎉 你在幸运之神的眷顾下抽中了： \n- {prize} x1！"
+        
+        wish_result_embed = discord.Embed(title=title, description=desc, colour=colour)
+        wish_result_embed.add_field(name="Twitter链接", value=twitter_link, inline=False)
+        wish_result_embed.add_field(name="奖品提供", value=contributor)
+        thumbnail_file = discord.File(f"{directory}{image_name}", filename=image_name)
+        wish_result_embed.set_thumbnail(url=f"attachment://{image_name}")
+        await response.send_message(file=thumbnail_file, embed=wish_result_embed, ephemeral=True)
+    
 
 async def claim(interaction):
     member = interaction.user
@@ -198,9 +232,9 @@ async def claim(interaction):
     result_message = ""
 
     if status:
-        result_message = f"<@{member.id}>, you claimed ${points} successfully!"
+        result_message = f"<@{member.id}>, 签到成功！你获得了 `${points} $JNW`！"
     else:
-        result_message = f"<@{member.id}>, you just claimed today! Come back tomorrow!"
+        result_message = f"<@{member.id}>, 你今天已经签到过了哦，记得明日再来。"
     
     await interaction.response.send_message(result_message, ephemeral=True)
 
