@@ -97,7 +97,7 @@ async def update(ctx, item_id, change):
 
 async def send_event_embed():
     # get the test channel 
-    test_channel = client.get_channel(1055319238149144576)
+    test_channel = client.get_channel(1056184573433761873)
     # TODO: add checking and not resend the event embed if it already exists
     title = "Jer\'s 圣诞跨年扭蛋"
     desc = """璀璨的星星灯点亮web3世界，
@@ -211,7 +211,7 @@ async def send_wish_result_embed(result, interaction):
         wish_result_embed = discord.Embed(title="抱歉！", description=f"很不幸地，<@{user_id}> 什么也没抽中！再接再厉！", colour=discord.Colour.red())
         wish_result_embed.set_image(url="https://media.giphy.com/media/d2lcHJTG5Tscg/giphy.gif")
         await interaction.response.send_message(embed=wish_result_embed, ephemeral=True)
-        wish_result_channel = await interaction.guild.fetch_channel(1056781667349569636)
+        wish_result_channel = await interaction.guild.fetch_channel(1056503133624356915)
         await wish_result_channel.send(embed=wish_result_embed)
     else:
         colour = discord.Colour.green()
@@ -229,7 +229,7 @@ async def send_wish_result_embed(result, interaction):
         thumbnail_file = discord.File(f"{directory}{image_name}", filename=image_name)
         wish_result_embed.set_thumbnail(url=f"attachment://{image_name}")
         await interaction.response.send_message(file=thumbnail_file, embed=wish_result_embed, ephemeral=True)
-        wish_result_channel = await interaction.guild.fetch_channel(1056781667349569636)
+        wish_result_channel = await interaction.guild.fetch_channel(1056503133624356915)
         
         await wish_result_channel.send(file=thumbnail_file, embed=wish_result_embed)
     
