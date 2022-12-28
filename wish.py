@@ -80,7 +80,7 @@ def standard_wish(user_id, user_roles):
 
     return None
 
-def view_prize_pool():
+def get_prize_pool():
     prize_pool_dict = {}
     
     for i in prize_pool_df.index.unique():
