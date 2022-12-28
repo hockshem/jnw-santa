@@ -9,15 +9,20 @@ import logging
 
 from discord.ui import View, Button
 from discord.ext import tasks, commands 
+from discord.ext import menus
 
 from wish import standard_wish, premium_wish, view_prize_pool, add_to_prize_pool, update_prize_pool, get_prize_name
-from member_points import increase_pts, get_pts_bal, claim_daily
+from member_points import increase_pts, get_pts_bal, claim_daily, get_leaderboard
+from leaderboard_menu import LeaderboardPageSource
 
 load_dotenv()
 token = os.getenv('BOT_TOKEN')
 
 intents = discord.Intents.default()
 intents.message_content = True
+gacha_channel_id = 1055319238149144576
+result_channel_id = 1056781667349569636
+
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
@@ -58,7 +63,7 @@ async def balance(ctx, member: discord.Member):
 async def prizepool(ctx):
     prize_pool_dict = view_prize_pool()
 
-    prize_pool_embed = discord.Embed(title="Prize Pool")
+    prize_pool_embed = discord.Embed(title="Prize Pool 🎁")
     
     prize_id_str = ""
     prize_name_str = ""
@@ -97,7 +102,7 @@ async def update(ctx, item_id, change):
 
 async def send_event_embed():
     # get the test channel 
-    test_channel = client.get_channel(1056184573433761873)
+    gacha_channel = client.get_channel(gacha_channel_id)
     # TODO: add checking and not resend the event embed if it already exists
     title = "Jer\'s 圣诞跨年扭蛋"
     desc = "璀璨的星星灯点亮web3世界，\n岁末狂欢派对集结号已经吹响！\n\n参与各种活动取得 $JNW 来参加扭蛋吧！"
@@ -129,13 +134,30 @@ async def send_event_embed():
     daily_button.style = discord.ButtonStyle.success
     daily_button.callback = claim
 
+    # leaderboard_button = Button()
+    # leaderboard_button.label = '排行榜'
+    # leaderboard_button.custom_id = 'leaderboard'
+    # leaderboard_button.emoji = '🏆'
+    # leaderboard_button.style = discord.ButtonStyle.success
+    # leaderboard_button.callback = leaderboard
+
     component_view.add_item(wish_button)
     component_view.add_item(bal_button)
     component_view.add_item(daily_button)
+    # component_view.add_item(leaderboard_button)
 
     event_embed.set_image(url="attachment://gacha.jpeg")
 
-    await test_channel.send(file=file, embed=event_embed, view=component_view)
+    await gacha_channel.send(file=file, embed=event_embed, view=component_view)
+
+
+@client.command()
+async def leaderboard(ctx):
+    (data, total_pts) = get_leaderboard()
+    formatter = LeaderboardPageSource(data, total_pts=total_pts)
+    menu = menus.MenuPages(formatter, delete_message_after=True)
+    await menu.start(ctx)
+
 
 async def send_balance(interaction):
     user_id = interaction.user.id
@@ -208,7 +230,7 @@ async def send_wish_result_embed(result, interaction):
         wish_result_embed = discord.Embed(title="抱歉！", description=f"很不幸地，<@{user_id}> 什么也没抽中！再接再厉！", colour=discord.Colour.red())
         wish_result_embed.set_image(url="https://media.giphy.com/media/d2lcHJTG5Tscg/giphy.gif")
         await interaction.response.send_message(embed=wish_result_embed, ephemeral=True)
-        wish_result_channel = await interaction.guild.fetch_channel(1056503133624356915)
+        wish_result_channel = await interaction.guild.fetch_channel(result_channel_id)
         await wish_result_channel.send(embed=wish_result_embed)
     else:
         colour = discord.Colour.green()
@@ -226,7 +248,7 @@ async def send_wish_result_embed(result, interaction):
         thumbnail_file = discord.File(f"{directory}{image_name}", filename=image_name)
         wish_result_embed.set_thumbnail(url=f"attachment://{image_name}")
         await interaction.response.send_message(file=thumbnail_file, embed=wish_result_embed, ephemeral=True)
-        wish_result_channel = await interaction.guild.fetch_channel(1056503133624356915)
+        wish_result_channel = await interaction.guild.fetch_channel(result_channel_id)
         
         await wish_result_channel.send(file=thumbnail_file, embed=wish_result_embed)
     

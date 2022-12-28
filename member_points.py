@@ -39,6 +39,18 @@ def decrease_pts(user_id, amount):
     points_df.loc[user_id, "Balance"] -= amount
     flush_member_points_data()
 
+def get_leaderboard():
+    leaderboard = []
+    sorted_points_df = points_df.sort_values(by=["Accumulated Points"], ascending=False)
+    total_points = 0 
+    
+    for i in sorted_points_df.index:
+        acc = points_df.loc[i, "Accumulated Points"]
+        leaderboard.append([i, acc])
+        total_points += acc
+    
+    return (leaderboard, total_points)
+
 def _can_claim_daily(user_id):
     if user_id in daily_df["Discord ID"].values:
         last_record = daily_df.loc[daily_df["Discord ID"] == user_id, "Daily Claim"].values[0]
@@ -83,3 +95,4 @@ def flush_daily_claim_data():
 def flush_member_points_data():
     new_points_df = points_df.reset_index(names="Discord ID")
     new_points_df.to_csv("./csv_data/member_points.csv", index=False)
+
