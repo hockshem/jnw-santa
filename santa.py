@@ -20,7 +20,8 @@ token = os.getenv('BOT_TOKEN')
 
 intents = discord.Intents.default()
 intents.message_content = True
-# intents.presences = True
+intents.presences = True
+intents.members = True
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
