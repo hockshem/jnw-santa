@@ -129,7 +129,7 @@ async def create_wish_records_embed(interaction):
     component_view = discord.ui.View()
     component_view.add_item(submit_wallet_button)
 
-    await interaction.response.send_message(embed=wish_records_embed, view=component_view)
+    await interaction.response.send_message(embed=wish_records_embed, view=component_view, ephemeral=True)
 
 async def submit_wallet(interaction):
     await interaction.response.send_modal(WalletSubmitForm())

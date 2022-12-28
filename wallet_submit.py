@@ -12,7 +12,7 @@ class WalletSubmitForm(Modal, title='提交钱包 🧧'):
         user_id = interaction.user.id
         wallet_address = self.wallet_address.value
         _add_wallet(user_id, wallet_address)
-        await interaction.response.send_message(f"<@{user_id}>，钱包地址更新成功！🎉 ")
+        await interaction.response.send_message(f"<@{user_id}>，钱包地址更新成功！🎉 ", ephemeral=True)
 
 wallet_df = pd.read_csv("./csv_data/wallets.csv")
 
