@@ -107,7 +107,7 @@ def add_to_prize_pool(tier, item_name, total, contributor, twitter, image_name="
     
     new_prize_df = pd.Series([next_id, item_name, total, total, contributor, twitter, image_name], index=prize_pool_df.columns).to_frame().T
     new_prize_df.index = [tier]
-    prize_pool_df = pd.concat([prize_pool_df, new_prize_df])
+    prize_pool_df = pd.concat([prize_pool_df, new_prize_df]).sort_values(by=["Item ID"])
     _flush_prize_pool_data()
     
 def get_item_count_in_tier(tier):
@@ -144,7 +144,7 @@ def _wish(tier):
     return wish_result_id, luck_status
 
 def update_prize_pool(item_id, amount):
-    prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Remaining"] += int(amount)
+    prize_pool_df.loc[prize_pool_df["Item ID"] == item_id, "Remaining"] += amount
     _flush_prize_pool_data()
 
 def _update_wish_record(user_id, item_id, item_name):

@@ -91,7 +91,7 @@ async def additem(ctx, tier, item_name, total_amount, contributor, twitter):
 
 @client.command()
 async def update(ctx, item_id, change):
-    update_prize_pool(item_id, change)
+    update_prize_pool(item_id, int(change))
     await ctx.send(f"Successfully updated the amount of item {item_id}: {get_prize_name(item_id)}!")
     
 
