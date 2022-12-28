@@ -151,7 +151,7 @@ def _update_wish_record(user_id, item_id, item_name):
     global wish_records_df
     timestamp = time.time()
     # TODO: add contributor
-    new_df = pd.Series([timestamp, user_id, item_id, item_name, "", ""], index=wish_records_df.columns).to_frame().T
+    new_df = pd.Series([timestamp, user_id, item_id, item_name], index=wish_records_df.columns).to_frame().T
     wish_records_df = pd.concat([wish_records_df, new_df], ignore_index=True)
     _flush_wish_records()
     
