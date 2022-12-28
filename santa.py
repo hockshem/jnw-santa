@@ -100,10 +100,7 @@ async def send_event_embed():
     test_channel = client.get_channel(1056184573433761873)
     # TODO: add checking and not resend the event embed if it already exists
     title = "Jer\'s 圣诞跨年扭蛋"
-    desc = """璀璨的星星灯点亮web3世界，
-            岁末狂欢派对集结号已经吹响！
-
-            参与各种活动取得 $JNW 来参加扭蛋吧！"""
+    desc = "璀璨的星星灯点亮web3世界，\n岁末狂欢派对集结号已经吹响！\n\n参与各种活动取得 $JNW 来参加扭蛋吧！"
     
     event_embed = discord.Embed(title=title, description=desc)
 

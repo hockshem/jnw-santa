@@ -9,7 +9,7 @@ Tier,Item ID,Item Name,Total,Remaining,Contributor,Twitter Link,Image Name
 1,A0008,Origamask NFT,3,3,Kevin,https://twitter.com/origamasks,origamask.jpeg
 1,A0009,TBP Whitelist,2,2,TBP,https://twitter.com/TheBlackPear1_,tbp.jpeg
 1,A0010,Iroiro Whitelist,4,3,JNW,https://twitter.com/IROIRO_NFT,iroiro.jpeg
-1,A0011,Free JoJo Whitelist,20,14,JNW,https://twitter.com/FreeJoJoNFT,freejojo.jpeg
+1,A0011,Free JoJo Whitelist,20,13,JNW,https://twitter.com/FreeJoJoNFT,freejojo.jpeg
 1,A0012,Free JoJo Whitelist,2,2,Homi Club,https://twitter.com/FreeJoJoNFT,freejojo.jpeg
 1,A0013,Earpitz Whitelist,1,1,Homi Club,https://twitter.com/EarpitzNFT,earpitz.jpeg
 1,A0014,Earpitz Whitelist,5,3,JNW,https://twitter.com/EarpitzNFT,earpitz.jpeg
@@ -26,4 +26,6 @@ Tier,Item ID,Item Name,Total,Remaining,Contributor,Twitter Link,Image Name
 2,B0008,Pionner+Lv5 ,5,5,Searchfi,https://twitter.com/searchfi_eth,searchfi.jpeg
 2,B0009,Pixel War,150,131,JNW,https://twitter.com/thepixelwar,tpw.png
 2,B0010,NOREN,90,71,JNW,https://twitter.com/Noren_project,noren.jpeg
+2,B0008,Zonmus,19,19,GY,https://twitter.com/zon_mus,zonmus.jpeg
 3,C0001,Nothing,999,999,,,
+
