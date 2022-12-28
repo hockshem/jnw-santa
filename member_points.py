@@ -14,7 +14,7 @@ def register_new_usr(user_id):
         new_df = pd.Series([0, 0], index=points_df.columns).to_frame().T
         new_df.index = [user_id]
         points_df = pd.concat([points_df, new_df])
-        flush_member_points_data()
+        _flush_member_points_data()
 
 def get_pts_bal(user_id):
     if user_id not in points_df.index: 
@@ -31,13 +31,13 @@ def increase_pts(user_id, amount):
         register_new_usr(user_id)
     points_df.loc[user_id, "Accumulated Points"] += amount
     points_df.loc[user_id, "Balance"] += amount
-    flush_member_points_data()
+    _flush_member_points_data()
     
 def decrease_pts(user_id, amount):
     if user_id not in points_df.index: 
         register_new_usr(user_id)
     points_df.loc[user_id, "Balance"] -= amount
-    flush_member_points_data()
+    _flush_member_points_data()
 
 def get_leaderboard():
     leaderboard = []
@@ -92,7 +92,7 @@ def claim_daily(user_id):
 def flush_daily_claim_data():
     daily_df.to_csv("./csv_data/daily_claim.csv", index=False)
 
-def flush_member_points_data():
+def _flush_member_points_data():
     new_points_df = points_df.reset_index(names="Discord ID")
     new_points_df.to_csv("./csv_data/member_points.csv", index=False)
 
