@@ -48,6 +48,16 @@ async def give(ctx, pts: int, *members: discord.Member):
     await ctx.send(f"{recipients} received {str(pts)} points!")
 
 @client.command()
+async def give(ctx, pts: int, *roles: discord.Role):
+    roles = [role.members for role in roles]
+    ids = []
+    for role in roles:
+        role_ids = role.members
+        ids.extend([f"<@{id}>" for id in role_ids])
+    recipients = ', '.join(ids)
+    await ctx.send(f"{recipients} received {str(pts)} points!")
+
+@client.command()
 async def balance(ctx, member: discord.Member):
     bal = get_pts_bal(member.id)
     await ctx.send(f"{member.name} has {str(bal)} points!")
