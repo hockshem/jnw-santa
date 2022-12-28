@@ -14,15 +14,13 @@ class WalletSubmitForm(Modal, title='提交钱包 🧧'):
         _add_wallet(user_id, wallet_address)
         await interaction.response.send_message(f"<@{user_id}>，钱包地址更新成功！🎉 ")
 
-
 wallet_df = pd.read_csv("./csv_data/wallets.csv")
 
 def _add_wallet(user_id, wallet):
     global wallet_df
     
-    user_records = wallet_df.loc[wallet_df["Discord ID"] == user_id, "Wallet"]
-    if user_records.count() > 0:
-        user_records["Wallet"] = wallet
+    if wallet_df.loc[wallet_df["Discord ID"] == user_id, "Wallet"].count() > 0:
+        wallet_df.loc[wallet_df["Discord ID"] == user_id, "Wallet"] = wallet
     else:
         new_df = pd.Series([user_id, wallet], index=wallet_df.columns).to_frame().T
         wallet_df = pd.concat([wallet_df, new_df], ignore_index=True)
