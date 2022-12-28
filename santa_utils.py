@@ -1,18 +1,25 @@
 import discord
 from discord.ui import View, Button
+from wallet_submit import WalletSubmitForm
 
 from member_points import get_pts_bal, claim_daily
-from wish import standard_wish, premium_wish, get_prize_pool
+from wish import standard_wish, premium_wish, get_prize_pool, get_wish_record
 
-gacha_channel_id = 1055319238149144576
-announcement_channel_id = 1056781667349569636
+gacha_channel_id = 1056184573433761873
+announcement_channel_id = 1056503133624356915
+
+test_mode = True
+
+if test_mode:
+    gacha_channel_id = 1055319238149144576
+    announcement_channel_id = 1056781667349569636
 
 async def send_event_embed(client):
     # get the test channel 
     gacha_channel = client.get_channel(gacha_channel_id)
     # TODO: add checking and not resend the event embed if it already exists
     title = "Jer\'s 圣诞跨年扭蛋"
-    desc = "璀璨的星星灯点亮web3世界，\n岁末狂欢派对集结号已经吹响！🎉\n\n快来参与各种活动取得 $JNW 来参加扭蛋吧！"
+    desc = "璀璨的星星灯点亮web3世界，\n岁末狂欢派对集结号已经吹响！🎉\n\n快来参与各种活动取得 `$JNW` 来参加扭蛋吧！"
     
     event_embed = discord.Embed(title=title, description=desc)
 
@@ -26,7 +33,7 @@ async def send_event_embed(client):
     wish_button.custom_id = 'wish'
     wish_button.emoji = '💫'
     wish_button.style = discord.ButtonStyle.primary
-    wish_button.callback = send_wish_details
+    wish_button.callback = send_wish_embed
 
     bal_button = Button()
     bal_button.label = '查看余额'
@@ -48,10 +55,19 @@ async def send_event_embed(client):
     # leaderboard_button.style = discord.ButtonStyle.success
     # leaderboard_button.callback = leaderboard
 
+    records_button = Button()
+    records_button.label = '中奖记录'
+    records_button.custom_id = 'records'
+    records_button.emoji = '🎁'
+    records_button.style = discord.ButtonStyle.success
+    records_button.callback = create_wish_records_embed
+
+
     component_view.add_item(wish_button)
     component_view.add_item(bal_button)
     component_view.add_item(daily_button)
     # component_view.add_item(leaderboard_button)
+    component_view.add_item(records_button)
 
     event_embed.set_image(url="attachment://gacha.jpeg")
 
@@ -84,12 +100,46 @@ def create_prize_pool_embed():
     prize_pool_embed.set_footer(text=f"总共数量：{total_prizes}")
     return prize_pool_embed
 
+async def create_wish_records_embed(interaction):
+    title = "中奖记录 🎁"
+
+    member = interaction.user
+    member_wish_records = get_wish_record(member.id)
+    wish_records_embed = discord.Embed(title=title)
+
+    submit_wallet_button = Button()
+    submit_wallet_button.label = '提交钱包'
+    submit_wallet_button.emoji = '🧧'
+    submit_wallet_button.custom_id = 'submitwallet'
+    submit_wallet_button.callback = submit_wallet
+    
+    if len(member_wish_records) > 0:
+        item_ids = ""
+        item_names = ""
+        
+        for id, name in member_wish_records:
+            item_ids += f"{id}\n"
+            item_names += f"{name}\n"
+        wish_records_embed.add_field(name="ID", value=item_ids)
+        wish_records_embed.add_field(name="奖品名字", value=item_names)
+    else:
+        submit_wallet_button.disabled = True
+        wish_records_embed.description = "无任何中奖记录"
+
+    component_view = discord.ui.View()
+    component_view.add_item(submit_wallet_button)
+
+    await interaction.response.send_message(embed=wish_records_embed, view=component_view)
+
+async def submit_wallet(interaction):
+    await interaction.response.send_modal(WalletSubmitForm())
+
 async def send_balance(interaction):
     user_id = interaction.user.id
     bal = get_pts_bal(interaction.user.id)
     await interaction.response.send_message(f"<@{user_id}>，你的余额为 `{bal} $JNW`。", ephemeral=True)
 
-async def send_wish_details(interaction):
+async def send_wish_embed(interaction):
     title = "选择许愿类型 💫"
     
     wish_details_embed = discord.Embed(title=title)

@@ -91,6 +91,9 @@ def get_prize_pool():
 
     return prize_pool_dict
 
+def get_wish_record(user_id):
+    return wish_records_df.loc[wish_records_df["Discord ID"] == user_id, ["Item ID", "Item Name"]].to_numpy()
+
 def add_to_prize_pool(tier, item_name, total, contributor, twitter, image_name=""):
     global prize_pool_df
 
