@@ -20,6 +20,7 @@ token = os.getenv('BOT_TOKEN')
 
 intents = discord.Intents.default()
 intents.message_content = True
+# intents.presences = True
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
@@ -45,17 +46,18 @@ async def give(ctx, pts: int, *members: discord.Member):
         increase_pts(member.id, pts)
         ids.append(f"<@{member.id}>")
     recipients = ', '.join(ids)
-    await ctx.send(f"{recipients} received {str(pts)} points!")
+    await ctx.send(f"{recipients} received {pts} points!")
 
-@client.command()
+@client.command(name="giveroles")
 async def give(ctx, pts: int, *roles: discord.Role):
-    roles = [role.members for role in roles]
     ids = []
     for role in roles:
-        role_ids = role.members
-        ids.extend([f"<@{id}>" for id in role_ids])
+        role_members = role.members
+        for member in role_members:
+            increase_pts(member.id, pts)
+            ids.append(f"<@{member.id}>")
     recipients = ', '.join(ids)
-    await ctx.send(f"{recipients} received {str(pts)} points!")
+    await ctx.send(f"{recipients} received {pts} points!")
 
 @client.command()
 async def balance(ctx, member: discord.Member):
