@@ -2,7 +2,7 @@ import discord
 from discord.ui import View, Button
 from wallet_submit import WalletSubmitForm
 
-from member_points import get_pts_bal, claim_daily
+from member_points import get_pts_bal, claim_daily, increase_pts
 from wish import standard_wish, premium_wish, get_prize_pool, get_wish_record
 
 gacha_channel_id = 1056184573433761873
@@ -61,7 +61,6 @@ async def send_event_embed(client):
     records_button.emoji = '🎁'
     records_button.style = discord.ButtonStyle.success
     records_button.callback = create_wish_records_embed
-
 
     component_view.add_item(wish_button)
     component_view.add_item(bal_button)
@@ -194,17 +193,19 @@ async def prm_wish(interaction):
 async def send_wish_result_embed(result, interaction):
     directory = "./graphics/"
 
-    luck_status = result["Status"]
+    luck_status = result["Status"] 
     prize = result["Name"]
-    twitter_link = result["Twitter"]
+    twitter_link = result["Twitter"] or "None"
     image_name = result["Image"]
-    contributor = result["Contributor"]
+    contributor = result["Contributor"] or "None"
     user_id = interaction.user.id 
 
     wish_announcement_channel = await interaction.guild.fetch_channel(announcement_channel_id)
 
     if luck_status == -1:
-        wish_result_embed = discord.Embed(title="抱歉！", description=f"很不幸地，<@{user_id}> 什么也没抽中！再接再厉！", colour=discord.Colour.red())
+        refund_amt = 50
+        wish_result_embed = discord.Embed(title="抱歉！", description=f"很不幸地，<@{user_id}> 什么也没抽中！但我们给你返还了 `{refund_amt} $JNW`，再接再厉！", colour=discord.Colour.red())
+        increase_pts(user_id, refund_amt)
         wish_result_embed.set_image(url="https://media.giphy.com/media/d2lcHJTG5Tscg/giphy.gif")
         await interaction.response.send_message(embed=wish_result_embed, ephemeral=True)        
         await wish_announcement_channel.send(embed=wish_result_embed)
@@ -222,13 +223,17 @@ async def send_wish_result_embed(result, interaction):
         wish_result_embed.add_field(name="Twitter链接", value=twitter_link, inline=False)
         wish_result_embed.add_field(name="奖品提供", value=contributor)
         
-        wish_thumbnail = discord.File(f"{directory}{image_name}", filename=f"wish_{image_name}")
-        wish_result_embed.set_thumbnail(url=f"attachment://wish_{image_name}")
-        await interaction.response.send_message(file=wish_thumbnail, embed=wish_result_embed, ephemeral=True)
-
-        announcement_thumbnail = discord.File(f"{directory}{image_name}", filename=f"announcement_{image_name}")
-        wish_result_embed.set_thumbnail(url=f"attachment://announcement_{image_name}")
-        await wish_announcement_channel.send(file=announcement_thumbnail, embed=wish_result_embed)
+        if len(image_name) > 0:
+            wish_thumbnail = discord.File(f"{directory}{image_name}", filename=f"wish_{image_name}")
+            wish_result_embed.set_thumbnail(url=f"attachment://wish_{image_name}")
+            await interaction.response.send_message(file=wish_thumbnail, embed=wish_result_embed, ephemeral=True)
+            announcement_thumbnail = discord.File(f"{directory}{image_name}", filename=f"announcement_{image_name}")
+            wish_result_embed.set_thumbnail(url=f"attachment://announcement_{image_name}")
+            await wish_announcement_channel.send(file=announcement_thumbnail, embed=wish_result_embed)
+        else:
+            await interaction.response.send_message(embed=wish_result_embed, ephemeral=True)
+            await wish_announcement_channel.send(embed=wish_result_embed)
+        
 
 async def claim(interaction):
     member = interaction.user
