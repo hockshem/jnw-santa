@@ -1,5 +1,5 @@
 Tier,Item ID,Item Name,Total,Remaining,Contributor,Twitter Link,Image Name
-1,A0001,Yu-Gi-Yn NFT,1,1,Jer,https://twitter.com/Yu_Gi_Yn,yugiyn.jpeg
+1,A0001,Yu-Gi-Yn NFT,1,0,Jer,https://twitter.com/Yu_Gi_Yn,yugiyn.jpeg
 1,A0002,Alpha Gang (Gen 2) NFT,2,2,Jer,https://twitter.com/AlphaGangX,ag.jpeg
 1,A0003,Cryptvques NFT,1,1,Jer,https://twitter.com/CRYPTYQUES,cryptyques.jpeg
 1,A0004,Origamask NFT,1,1,xxxxxxLess,https://twitter.com/origamasks,origamask.jpeg
@@ -8,24 +8,24 @@ Tier,Item ID,Item Name,Total,Remaining,Contributor,Twitter Link,Image Name
 1,A0007,Uncanny Country Club NFT,2,2,Kevin,https://twitter.com/TheUncannyClub,theuncanny.jpeg
 1,A0008,Origamask NFT,3,3,Kevin,https://twitter.com/origamasks,origamask.jpeg
 1,A0009,TBP Whitelist,2,2,TBP,https://twitter.com/TheBlackPear1_,tbp.jpeg
-1,A0010,Iroiro Whitelist,4,3,JNW,https://twitter.com/IROIRO_NFT,iroiro.jpeg
-1,A0011,Free JoJo Whitelist,20,13,JNW,https://twitter.com/FreeJoJoNFT,freejojo.jpeg
+1,A0010,Iroiro Whitelist,4,2,JNW,https://twitter.com/IROIRO_NFT,iroiro.jpeg
+1,A0011,Free JoJo Whitelist,20,11,JNW,https://twitter.com/FreeJoJoNFT,freejojo.jpeg
 1,A0012,Free JoJo Whitelist,2,2,Homi Club,https://twitter.com/FreeJoJoNFT,freejojo.jpeg
 1,A0013,Earpitz Whitelist,1,1,Homi Club,https://twitter.com/EarpitzNFT,earpitz.jpeg
-1,A0014,Earpitz Whitelist,5,3,JNW,https://twitter.com/EarpitzNFT,earpitz.jpeg
-1,A0015,Earpitz Whitelist,9,9,HAN,https://twitter.com/EarpitzNFT,earpitz.jpeg
-1,A0016,Zero 48 (Guaranteed WL),15,14,ZeroX ,https://twitter.com/ProjectZR_X,zerox.jpeg
-1,A0017,Createra Whitelist,33,15,Createra,https://twitter.com/Createra_,createra.jpeg
+1,A0014,Earpitz Whitelist,5,2,JNW,https://twitter.com/EarpitzNFT,earpitz.jpeg
+1,A0015,Earpitz Whitelist,9,8,HAN,https://twitter.com/EarpitzNFT,earpitz.jpeg
+1,A0016,Zero 48 (Guaranteed WL),15,13,ZeroX ,https://twitter.com/ProjectZR_X,zerox.jpeg
+1,A0017,Createra Whitelist,33,12,Createra,https://twitter.com/Createra_,createra.jpeg
 1,A0018,Dudulab NFT,5,4,Dudulab,https://twitter.com/dudulabNFT,dudu.jpeg
-1,A0019,Whiko Land NFT,6,5,ZeroX ,https://twitter.com/WHIKO_LAND,whiko.jpeg
-1,A0020,Realms Hunter Whitelist,43,24,JNW,https://twitter.com/realmhunterio,rh.jpeg
-2,B0001,TBP Invite Link,50,49,TBP,https://twitter.com/TheBlackPear1_,tbp.jpeg
-2,B0002,WarpedNFT Whitelist,50,43,fashionpolice,https://twitter.com/WarpedNFT,warped.jpeg
-2,B0003,Adventurers Whitelist,90,71,REX,https://twitter.com/Adventurers2023,adventurers.jpeg
+1,A0019,Whiko Land NFT,6,4,ZeroX ,https://twitter.com/WHIKO_LAND,whiko.jpeg
+1,A0020,Realms Hunter Whitelist,43,21,JNW,https://twitter.com/realmhunterio,rh.jpeg
+2,B0001,TBP Invite Link,50,47,TBP,https://twitter.com/TheBlackPear1_,tbp.jpeg
+2,B0002,WarpedNFT Whitelist,50,41,fashionpolice,https://twitter.com/WarpedNFT,warped.jpeg
+2,B0003,Adventurers Whitelist,90,70,REX,https://twitter.com/Adventurers2023,adventurers.jpeg
 2,B0004,Glorious Reality by Marc Bishop Whitelist,80,78,JNW,https://twitter.com/GloriousRealNFT,gr.jpeg
-2,B0005,Pionner+Lv5 ,5,5,Searchfi,https://twitter.com/searchfi_eth,searchfi.jpeg
-2,B0006,Pixel War,150,130,JNW,https://twitter.com/thepixelwar,tpw.png
-2,B0007,NOREN,90,70,JNW,https://twitter.com/Noren_project,noren.jpeg
-2,B0008,Zonmus,19,10,GY,https://twitter.com/zon_mus,zonmus.jpeg
-2,B0009,Fortune Unicorn Club,19,19,JNW,https://twitter.com/FortuneUnicornC,
+2,B0005,Pionner+Lv5 ,5,4,Searchfi,https://twitter.com/searchfi_eth,searchfi.jpeg
+2,B0006,Pixel War,150,85,JNW,https://twitter.com/thepixelwar,tpw.png
+2,B0007,NOREN,90,66,JNW,https://twitter.com/Noren_project,noren.jpeg
+2,B0008,Zonmus,19,9,GY,https://twitter.com/zon_mus,zonmus.jpeg
+2,B0009,Fortune Unicorn Club,19,18,JNW,https://twitter.com/FortuneUnicornC,ffc.jpeg
 3,C0001,Nothing,999,999,,,
