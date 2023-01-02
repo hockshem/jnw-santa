@@ -8,7 +8,7 @@ from wish import standard_wish, premium_wish, get_prize_pool, get_wish_record
 gacha_channel_id = 1056184573433761873
 announcement_channel_id = 1056503133624356915
 
-test_mode = True
+test_mode = False
 
 if test_mode:
     gacha_channel_id = 1055319238149144576
@@ -16,7 +16,13 @@ if test_mode:
 
 async def send_event_embed(client):
     # get the test channel 
+
     gacha_channel = client.get_channel(gacha_channel_id)
+
+    last_message = await gacha_channel.fetch_message(gacha_channel.last_message_id)
+    if last_message.author.id == client.user.id:
+        await last_message.delete()
+
     # TODO: add checking and not resend the event embed if it already exists
     title = "Jer\'s 圣诞跨年扭蛋"
     desc = "璀璨的星星灯点亮web3世界，\n岁末狂欢派对集结号已经吹响！🎉\n\n快来参与各种活动取得 `$JNW` 来参加扭蛋吧！"
@@ -33,20 +39,23 @@ async def send_event_embed(client):
     wish_button.custom_id = 'wish'
     wish_button.emoji = '💫'
     wish_button.style = discord.ButtonStyle.primary
-    wish_button.callback = send_wish_embed
+    # wish_button.callback = send_wish_embed
+    wish_button.disabled = True
 
     bal_button = Button()
     bal_button.label = '查看余额'
     bal_button.custom_id = 'balance'
     bal_button.emoji = '💰'
-    bal_button.callback = send_balance
+    # bal_button.callback = send_balance
+    bal_button.disabled = True
 
     daily_button = Button()
     daily_button.label = '每日签到'
     daily_button.custom_id = 'daily'
     daily_button.emoji = '📆'
     daily_button.style = discord.ButtonStyle.success
-    daily_button.callback = claim
+    daily_button.disabled = True
+    # daily_button.callback = claim
 
     # leaderboard_button = Button()
     # leaderboard_button.label = '排行榜'
@@ -56,9 +65,9 @@ async def send_event_embed(client):
     # leaderboard_button.callback = leaderboard
 
     records_button = Button()
-    records_button.label = '中奖记录'
+    records_button.label = '提交钱包'
     records_button.custom_id = 'records'
-    records_button.emoji = '🎁'
+    records_button.emoji = '🧧'
     records_button.style = discord.ButtonStyle.success
     records_button.callback = create_wish_records_embed
 
