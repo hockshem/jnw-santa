@@ -65,17 +65,18 @@ async def send_event_embed(client):
     # leaderboard_button.callback = leaderboard
 
     records_button = Button()
-    records_button.label = '提交钱包'
+    records_button.label = '中奖记录'
     records_button.custom_id = 'records'
-    records_button.emoji = '🧧'
+    records_button.emoji = '🎁'
     records_button.style = discord.ButtonStyle.success
     records_button.callback = create_wish_records_embed
 
+    component_view.add_item(records_button)
     component_view.add_item(wish_button)
     component_view.add_item(bal_button)
     component_view.add_item(daily_button)
     # component_view.add_item(leaderboard_button)
-    component_view.add_item(records_button)
+    
 
     event_embed.set_image(url="attachment://gacha.jpeg")
 
@@ -119,7 +120,8 @@ async def create_wish_records_embed(interaction):
     submit_wallet_button.label = '提交钱包'
     submit_wallet_button.emoji = '🧧'
     submit_wallet_button.custom_id = 'submitwallet'
-    submit_wallet_button.callback = submit_wallet
+    # submit_wallet_button.callback = submit_wallet
+    submit_wallet_button.disabled = True
     
     if len(member_wish_records) > 0:
         item_ids = ""
